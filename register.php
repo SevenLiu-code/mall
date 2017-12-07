@@ -95,7 +95,6 @@
                             <button type="submit">注册</button>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>

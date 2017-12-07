@@ -16,10 +16,8 @@ function mysqlInit($host, $username, $password, $db) // 连接数据库
 }
 function creatPassword($password) // 密码加密
 {
-    if (!$password)
-    {
+    if (!$password) {
         return false;
     }
-    return md5(md5($password).'imooc');
-
+    return md5(md5($password) . 'imooc');
 }
