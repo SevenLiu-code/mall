@@ -5,30 +5,31 @@ if(isset($_SESSION['user']) && !empty($_SESSION['user'])) {
 }
 if (!empty($_POST['username'])) {
     include_once './lib/fun.php';
-    $username = trim($_POST['username']);
-    $password = trim($_POST['password']);
-    if (!$username) {
-        echo 'alert("用户名不能为空！")'; exit;
-    }
-    if (!$password) {
-        echo 'alert("密码名不能为空！")'; exit;
-    }
     //数据操作
     $con = mysqlInit('localhost','root', 'root', 'imooc_mall');
     if (!$con) {
         echo '数据库连接失败'.mysqli_connect_error();
         exit;
     }
+    $username = trim(mysqli_real_escape_string($con, $_POST['username']));
+    $password = trim(mysqli_real_escape_string($con, $_POST['password']));
+    if (!$username) {
+        msg(2, '用户名不能为空！');
+    }
+    if (!$password) {
+        msg(2, '密码不能为空！');
+    }
+
     $sql = "SELECT * FROM `im_user` WHERE `username` = '{$username}' LIMIT 1";
     $obj = mysqli_query($con, $sql);
     $result = mysqli_fetch_assoc($obj);
     if(is_array($result) && !empty($result)){
         if ( creatPassword($password) === $result['password']) {
             $_SESSION['user'] = $result;
-            header('Location:http://localhost/project/mall/index.php');
-        } else { echo '密码错误，请重新输入'; exit; }
+            msg(1, '登录成功！', 'index.php' );
+        } else { msg(2, '密码错误，请重新输入！'); }
     } else {
-        echo '用户不存在，请重新输入'; exit;
+        echo msg(2, '用户名不存在！');
     }
 }
 ?>

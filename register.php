@@ -1,33 +1,33 @@
 <?php
     if (!empty($_POST['username'])) {
         include_once './lib/fun.php';
-        $username = trim($_POST['username']);
-        $password = trim($_POST['password']);
-        $repassword = trim($_POST['repassword']);
-        if (!$username) {
-            echo 'alert("用户名不能为空！")'; exit;
-        }
-        if (!$password) {
-            echo 'alert("密码名不能为空！")'; exit;
-        }
-        if (!$repassword) {
-            echo 'alert("确认密码名不能为空！")'; exit;
-        }
-        if ($password !== $repassword) {
-            echo 'alert("两次密码输入不相同！")'; exit;
-        }
         //数据操作
         $con = mysqlInit('localhost','root', 'root', 'imooc_mall');
         if (!$con) {
             echo '数据库连接失败'.mysqli_connect_error();
             exit;
         }
+        $username = trim(mysqli_real_escape_string($con, $_POST['username']));
+        $password = trim(mysqli_real_escape_string($con, $_POST['password']));
+        $repassword = trim(mysqli_real_escape_string($con, $_POST['repassword']));
+        if (!$username) {
+            msg(2, '用户名不能为空！');
+        }
+        if (!$password) {
+            msg(2, '密码名不能为空！');
+        }
+        if (!$repassword) {
+            msg(2, '确认密码不能为空！');
+        }
+        if ($password !== $repassword) {
+            msg(2, '两次密码输入不相同！');
+        }
         // 判断用户数据是否存在
         $sql = "SELECT COUNT(`id`) AS total FROM `im_user` WHERE username = '{$username}'";
         $obj = mysqli_query($con, $sql);
         $result = mysqli_fetch_assoc($obj);
         if (isset($result['total'])&&$result['total'] > 0) { // 判断用户提交的用户名是否已存在
-            echo "alert(用户名已存在，请重新输入)"; exit;
+            msg(2, '用户名已存在，请重新输入');
         } else {
             // 密码加密处理
             $password = creatPassword($password);
@@ -36,10 +36,9 @@
             if ($obj) {
                 $result = mysqli_query($con, "SELECT LAST_INSERT_ID()"); //插入成功的主键ID;
                 $userId = mysqli_fetch_assoc($result);
-                echo sprintf("恭喜您注册成功，用户名：%s，用户ID：%s", $username, $userId['LAST_INSERT_ID()']);
-                exit;
+                msg(2, sprintf("恭喜您注册成功，用户名：%s，用户ID：%s", $username, $userId['LAST_INSERT_ID()']), 'login.php');
             } else {
-                echo mysqli_error();
+                msg(2, mysqli_error());
             }
         }
     }

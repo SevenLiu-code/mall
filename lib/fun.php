@@ -21,3 +21,17 @@ function creatPassword($password) // 密码加密
     }
     return md5(md5($password) . 'imooc');
 }
+
+/**
+ * @param $type 1: 成功  2: 失败
+ * @param null $msg
+ * @param null $url
+ */
+function msg($type, $msg=null, $url=null) //消息提示
+{
+    $tourl = "Location:http://localhost/project/mall/message.php?&type={$type}";
+    $tourl.= $msg ? "&msg={$msg}" : ''; //当msg为空时，url不写入
+    $tourl.= $url ? "&url={$url}" : '';
+    header($tourl);
+    exit;
+}
