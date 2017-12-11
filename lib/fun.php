@@ -35,3 +35,32 @@ function msg($type, $msg=null, $url=null) //消息提示
     header($tourl);
     exit;
 }
+
+function imgUpload($file) {
+    if (!is_uploaded_file($file['tmp_name'])){ // 检测上传文件是否合法
+        msg(2, '请上传符合规范的图像');
+    }
+    $type = $file['type'];
+    if (!in_array($type, array("image/png","image/gif","image/jpeg"))){ //图像类型验证
+        msg(2, '请上传png，gif，jpeg的图像');
+    }
+    $now = $_SERVER['REQUEST_TIME'];// 时间戳
+    // 上传目录
+    $uploadPath = './static/file/';
+    //上传目录访问url
+    $uploadUrl = '/static/file/';
+    //上传文件夹
+    $fileDir = date('Y/m/d', $now);
+    //检测目前是否存在
+    if (!is_dir($uploadPath.$fileDir)) {
+        mkdir($uploadPath.$fileDir, 0755, true); //递归创建目录
+    }
+    // 获取文件名
+    $ext = strtolower(pathinfo($file['name'],PATHINFO_EXTENSION)); //拿到文件扩展名
+    $img = uniqid().mt_rand(1000, 9999).'.'.$ext; // 图片名称
+    $imgPath = $uploadPath.$fileDir.$img; //图片屋里地址
+    $imgUrl = 'http://localhost/project/mall'.$uploadUrl.$fileDir.$img; //图片url地址
+    if(!move_uploaded_file($file['tmp_name'], $imgPath)){
+        msg(2, '服务器繁忙，请稍后再试...');
+    } else { return $imgUrl; }
+}

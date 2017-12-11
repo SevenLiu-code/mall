@@ -19,7 +19,6 @@ if (!empty($_POST['username'])) {
     if (!$password) {
         msg(2, '密码不能为空！');
     }
-
     $sql = "SELECT * FROM `im_user` WHERE `username` = '{$username}' LIMIT 1";
     $obj = mysqli_query($con, $sql);
     $result = mysqli_fetch_assoc($obj);
