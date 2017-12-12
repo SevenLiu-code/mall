@@ -44,13 +44,12 @@ function imgUpload($file) {
     if (!in_array($type, array("image/png","image/gif","image/jpeg"))){ //图像类型验证
         msg(2, '请上传png，gif，jpeg的图像');
     }
-    $now = $_SERVER['REQUEST_TIME'];// 时间戳
     // 上传目录
     $uploadPath = './static/file/';
     //上传目录访问url
     $uploadUrl = '/static/file/';
     //上传文件夹
-    $fileDir = date('Y/m/d', $now);
+    $fileDir = date('Y/m/d', $_SERVER['REQUEST_TIME']);
     //检测目前是否存在
     if (!is_dir($uploadPath.$fileDir)) {
         mkdir($uploadPath.$fileDir, 0755, true); //递归创建目录
