@@ -34,14 +34,14 @@ if(!empty($_POST['name'])){
         msg(2, '画品详情信息不能为空');
     }
     $now = $_SERVER['REQUEST_TIME']; // 时间戳
-    // 要做商品唯一性处理
-    $sql = "SELECT COUNT(`id`) AS total FROM `im_goods` WHERE name = '{$name}'";
-    $obj = mysqli_query($con, $sql);
-    $result = mysqli_fetch_assoc($obj);
-    if(isset($result['total'])&&$result['total'] > 0){
-        msg(2, '画品信息已存在');
-    } else {
-        $pic = imgUpload($_FILES['file']);
+        // 要做商品唯一性处理
+        $sql = "SELECT COUNT(`id`) AS total FROM `im_goods` WHERE name = '{$name}'";
+        $obj = mysqli_query($con, $sql);
+        $result = mysqli_fetch_assoc($obj);
+        if(isset($result['total'])&&$result['total'] > 0){
+            msg(2, '画品信息已存在');
+        } else {
+            $pic = imgUpload($_FILES['file']);
         // 入库处理
         $sql = "INSERT INTO `im_goods`(`name`, `price`, `pic`, `des`, `content`, `user_id`, `create_time`, `update_time`, `view`) 
 VALUES('{$name}', '{$price}', '{$pic}', '{$des}', '{$content}', '{$user['id']}', '{$now}', '{$now}', 0)";
