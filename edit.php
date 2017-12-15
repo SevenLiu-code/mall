@@ -1,69 +1,34 @@
 <?php
-session_start();
-include_once './lib/fun.php';
-if(!isset($_SESSION['user']) || empty($_SESSION['user'])) {
-    msg(2, '请先登录！', 'login.php');
-}
-$user = $_SESSION['user'];
-if(!empty($_POST['name'])){
-    //数据操作
+    include_once './lib/fun.php';
+    if(!checkLogin()){
+        msg(2, '请先登录!', 'login.php');
+    }
+    $user = $_SESSION['user'];
+    $goodsID = isset($_GET['id']) && is_numeric($_GET['id']) ? intval($_GET['id']) : '';
+    // 如果ID不存在，就跳转商品列表页
+    if (!$goodsID) {
+        msg(2, '参数非法','index.php');
+    }
+    // 连接数据库
     $con = mysqlInit('localhost','root', 'root', 'imooc_mall');
     if (!$con) {
         echo '数据库连接失败'.mysqli_connect_error();
         exit;
     }
-    $name = trim(mysqli_real_escape_string($con, $_POST['name']));
-    $price = intval($_POST['price']);
-    $des = trim(mysqli_real_escape_string($con, $_POST['des']));
-    $content = trim(mysqli_real_escape_string($con, $_POST['content']));
-    $nameLen = mb_strlen($name, 'utf-8');
-    if ($nameLen<=0&&$nameLen>30){
-        msg(2, '画品名应在1-30字符之内');
+    $sql = "SELECT * FROM `im_goods` WHERE `id` = '{$goodsID}'";
+    $obj = mysqli_query($con, $sql);
+    if(!$goods = mysqli_fetch_assoc($obj)) {
+       msg(2, '画品不存在', 'index.php');
     }
-    $priceLen = mb_strlen($price, 'utf-8');
-    if ($priceLen<=0&&$priceLen>999999999){
-        msg(2, '请输入最多9位正整数');
-    }
-    $desLen = mb_strlen($des, 'utf-8');
-    if ($desLen<=0&&$desLen>100){
-        msg(2, '画品简介应在1-100字符之内');
-    }
-    $contentLen = mb_strlen($content, 'utf-8');
-    if (empty($content)) {
-        msg(2, '画品详情信息不能为空');
-    }
-    $now = $_SERVER['REQUEST_TIME']; // 时间戳
-        // 要做商品唯一性处理
-        $sql = "SELECT COUNT(`id`) AS total FROM `im_goods` WHERE name = '{$name}'";
-        $obj = mysqli_query($con, $sql);
-        $result = mysqli_fetch_assoc($obj);
-        if(isset($result['total'])&&$result['total'] > 0){
-            msg(2, '画品信息已存在');
-        } else {
-            $pic = imgUpload($_FILES['file']);
-            // 入库处理
-            $sql = "INSERT INTO `im_goods`(`name`, `price`, `pic`, `des`, `content`, `user_id`, `create_time`, `update_time`, `view`) 
-    VALUES('{$name}', '{$price}', '{$pic}', '{$des}', '{$content}', '{$user['id']}', '{$now}', '{$now}', 0)";
-            if(mysqli_query($con, $sql)){
-                $result = mysqli_query($con, "SELECT LAST_INSERT_ID()"); //插入成功的主键ID;
-                $goodsId = mysqli_fetch_assoc($result);
-                var_dump($goodsId);die;
-            } else {
-                echo mysqli_error($con); exit;
-            }
-    }
-}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>M-GALLARY|发布画品</title>
+    <title>M-GALLARY|编辑画品</title>
     <link type="text/css" rel="stylesheet" href="./static/css/common.css">
     <link type="text/css" rel="stylesheet" href="./static/css/add.css">
-    <style>
-        input[type="text"], textarea { text-indent: 1em; }
-    </style>
 </head>
 <body>
 <div class="header">
@@ -72,7 +37,7 @@ if(!empty($_POST['name'])){
     </div>
     <div class="auth fr">
         <ul>
-            <li><span>管理员：<?php echo $user['username']; ?></span></li>
+            <li><span>管理员：<?php echo $user['username'] ?></span></li>
             <li><a href="#">退出</a></li>
         </ul>
     </div>
@@ -80,31 +45,32 @@ if(!empty($_POST['name'])){
 <div class="content">
     <div class="addwrap">
         <div class="addl fl">
-            <header>发布画品</header>
-            <form name="publish-form" id="publish-form" action="publish.php" method="post"
+            <header>编辑画品</header>
+            <form name="publish-form" id="publish-form" action="do_edit.php" method="post"
                   enctype="multipart/form-data">
                 <div class="additem">
-                    <label id="for-name">画品名称</label><input type="text" name="name" id="name" placeholder="请输入画品名称">
+                    <label id="for-name">画品名称</label><input type="text" name="name" id="name" placeholder="请输入画品名称" value="<?php echo $goods['name']?>">
                 </div>
                 <div class="additem">
-                    <label id="for-price">价值</label><input type="text" name="price" id="price" placeholder="请输入画品价值">
+                    <label id="for-price">价值</label><input type="text" name="price" id="price" placeholder="请输入画品价值" value="<?php echo $goods['price']?>" >
                 </div>
                 <div class="additem">
                     <!-- 使用accept html5属性 声明仅接受png gif jpeg格式的文件                -->
-                    <label id="for-file">画品</label><input type="file" accept="image/png,image/gif,image/jpeg" id="file"
-                      name="file">
+                    <label id="for-file">画品</label><input type="file" accept="image/png,image/gif,image/jpeg" id="file" name="file">
                 </div>
                 <div class="additem textwrap">
-                    <label class="ptop" id="for-des">画品简介</label><textarea id="des" name="des"
-                     placeholder="请输入画品简介"></textarea>
+                    <label class="ptop" id="for-des">画品简介</label>
+                    <textarea id="des" name="des" placeholder="请输入画品简介"><?php echo $goods['des']?></textarea>
                 </div>
                 <div class="additem textwrap">
                     <label class="ptop" id="for-content">画品详情</label>
                     <div style="margin-left: 120px" id="container">
-                        <textarea id="content" name="content"></textarea>
+                        <textarea id="content" name="content"><?php echo $goods['content']?></textarea>
                     </div>
                 </div>
                 <div style="margin-top: 20px">
+                    <!-- 隐藏商品id 用于提交商品信息 -->
+                    <input type="hidden" name="id" value="<?php echo $goods['id']?>">
                     <button type="submit">发布</button>
                 </div>
             </form>
@@ -166,18 +132,16 @@ if(!empty($_POST['name'])){
                 return false;
             }
 
-            if (file == '' || file.length <= 0) {
-                layer.tips('请选择图片', '#file', {time: 2000, tips: 2});
-                $('#file').focus();
-                return false;
-            }
-
+//            if (file == '' || file.length <= 0) {
+//                layer.tips('请选择图片', '#file', {time: 2000, tips: 2});
+//                $('#file').focus();
+//                return false;
+//            }
             if (des.length <= 0 || des.length >= 100) {
                 layer.tips('画品简介应在1-100字符之内', '#content', {time: 2000, tips: 2});
                 $('#des').focus();
                 return false;
             }
-
             if (content.length <= 0) {
                 layer.tips('请输入画品详情信息', '#container', {time: 2000, tips: 3});
                 $('#content').focus();
@@ -188,3 +152,5 @@ if(!empty($_POST['name'])){
     })
 </script>
 </html>
+
+

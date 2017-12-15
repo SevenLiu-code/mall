@@ -41,7 +41,7 @@ function imgUpload($file) {
         msg(2, '请上传符合规范的图像');
     }
     $type = $file['type'];
-    if (!in_array($type, array("image/png","image/gif","image/jpeg"))){ //图像类型验证
+    if (!in_array($type, array("image/png", "image/gif","image/jpeg"))){ //图像类型验证
         msg(2, '请上传png，gif，jpeg的图像');
     }
     // 上传目录
@@ -62,4 +62,15 @@ function imgUpload($file) {
     if(!move_uploaded_file($file['tmp_name'], $imgPath)){
         msg(2, '服务器繁忙，请稍后再试...');
     } else { return $imgUrl; }
+}
+
+/**
+ * 检测用户是否登录
+ */
+function checkLogin() {
+    session_start();
+    if (!isset($_SESSION['user']) || empty($_SESSION['user'])){
+        return false;
+    }
+    return true;
 }

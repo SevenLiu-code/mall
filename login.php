@@ -1,10 +1,9 @@
 <?php
-session_start();
-if(isset($_SESSION['user']) && !empty($_SESSION['user'])) {
-    header('Location:http://localhost/project/mall/index.php'); exit;
+include_once './lib/fun.php';
+if(checkLogin()){
+    msg(1, '您已登录，正在跳转...', 'index.php');
 }
 if (!empty($_POST['username'])) {
-    include_once './lib/fun.php';
     //数据操作
     $con = mysqlInit('localhost','root', 'root', 'imooc_mall');
     if (!$con) {
