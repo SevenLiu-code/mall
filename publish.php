@@ -47,7 +47,7 @@ if(!empty($_POST['name'])){
             if(mysqli_query($con, $sql)){
                 $result = mysqli_query($con, "SELECT LAST_INSERT_ID()"); //插入成功的主键ID;
                 $goodsId = mysqli_fetch_assoc($result);
-                var_dump($goodsId);die;
+                msg(1, '提交成功，正在跳转', 'index.php');
             } else {
                 echo mysqli_error($con); exit;
             }

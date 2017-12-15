@@ -10,5 +10,5 @@ if(!checkLogin()){
     msg(2, '不合法连接，正在跳转', 'login.php');
 } else {
     unset($_SESSION['user']);
-    msg(2, '退出成功，正在跳转', 'login.php');
+    msg(2, '退出登陆成功，正在跳转', 'login.php');
 }

@@ -74,3 +74,11 @@ function checkLogin() {
     }
     return true;
 }
+// page分页
+function pages($total, $currentPage, $pageSize, $show=6) {
+    $pageStr = '';
+    if ($total > $pageSize){
+
+    }
+    return $pageStr;
+}

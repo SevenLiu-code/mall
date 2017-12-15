@@ -3,6 +3,27 @@ include_once './lib/fun.php';
 if($login = checkLogin()){
     $user = $_SESSION['user'];
 }
+//数据操作
+$con = mysqlInit('localhost','root', 'root', 'imooc_mall');
+if (!$con) {
+    echo '数据库连接失败'.mysqli_connect_error();
+    exit;
+}
+// 商品查询
+    // 检测page参数
+    $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+    // 最小值取1
+    $page = max($page, 1);
+    // 每页显示条数
+    $pageSize = 2;
+    $offset = $pageSize*($page-1);
+    $sql = "SELECT * FROM `im_goods` WHERE `status` = 1 ORDER BY `id` ASC, `view` DESC LIMIT {$offset},{$pageSize}";
+    $obj = mysqli_query($con, $sql);
+    $goods = array();
+    while($result = mysqli_fetch_assoc($obj)){
+        $goods[] = $result;
+    }
+    var_dump($goods);
 ?>
 
 <!DOCTYPE html>
