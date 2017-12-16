@@ -23,7 +23,8 @@ if (!$con) {
     while($result = mysqli_fetch_assoc($obj)){
         $goods[] = $result;
     }
-    var_dump($goods);
+    echo pages(30, $page, 3, 5);
+    echo getUrl();
 ?>
 
 <!DOCTYPE html>
@@ -72,6 +73,7 @@ if (!$con) {
                 </li>
         </ul>
     </div>
+    <div class="page-nav"></div>
 </div>
 
 <div class="footer">
@@ -81,7 +83,7 @@ if (!$con) {
 <script src="./static/js/jquery-1.10.2.min.js"></script>
 <script>
     $(function () {
-        $('.del').on('click',function () {
+        $('.del').on('click', function () {
             if(confirm('确认删除该画品吗?'))
             {
                 window.location = $(this).attr('href');
