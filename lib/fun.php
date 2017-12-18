@@ -78,9 +78,35 @@ function checkLogin() {
 //获取utl
 function getUrl(){
     $url = '';
-    $url .= $_SERVER['SERVER_PORT'] == 443 ? 'https://' : 'http://';
-    $url .= $_SERVER['HTTP_HOST'];
-    $url .= $_SERVER['REQUEST_URI'];
+    $url .= $_SERVER['SERVER_PORT'] == 443 ? 'https://' : 'http://'; //
+    $url .= $_SERVER['HTTP_HOST']; //
+    $url .= $_SERVER['REQUEST_URI']; // 获取GET数据
+    return $url;
+}
+
+/**
+ * @param $page 页数
+ * @param string $url
+ * @return string 根据$page生成url
+ */
+function pageUrl($page, $url=''){
+    $url = empty($url) ? getUrl() : $url;
+    // 查询URL中是否有？号
+    $pos = strpos($url, '?');
+    if($pos === false){
+        $url .= '?page='.$page;
+    } else {
+        $qureyString = substr($url, $pos+1);
+        //解析$qureyString为数组
+        parse_str($qureyString, $qureyArr);
+        if(isset($qureyArr['page'])){
+            unset($qureyArr['page']); //删除原有page
+        }
+        $qureyArr['page'] = $page;
+        //将qureyArr重新拼接成查询字符串
+        $str = http_build_query($qureyArr);
+        $url = substr($url, 0, $pos).'?'.$str; // 重新拼接URL
+    }
     return $url;
 }
 // page分页
@@ -91,7 +117,7 @@ function getUrl(){
  * @param int $show 分页显示个数
  * @return string
  */
-function pages($total, $currentPage, $pageSize, $show=6) {
+function pages($total, $currentPage, $pageSize, $show=5) {
         $pageStr = '';
     if ($total > $pageSize){
         $pageStr .= '<div class="page-nav"><ul>';
@@ -100,7 +126,7 @@ function pages($total, $currentPage, $pageSize, $show=6) {
         $currentPage = $currentPage > $totalPage ? $totalPage : $currentPage;
         // 当前仅当当前页大于1的时候出现首页和上一页
         if($currentPage>1){ // 如果当前页大于1，$currentPage只能为1或大于1
-            $pageStr .= "<li><a href='1'>首页</a></li><li><a href='". ($currentPage-1) . "'>上一页</a></li>";
+            $pageStr .= "<li><a href=". pageUrl(1) ."'1'>首页</a></li><li><a href='". pageUrl($currentPage-1) . "'>上一页</a></li>";
         } else {
             $pageStr .= '<li><a href="javascript:;">首页</a></li><li><a href="javascript:;">上一页</a></li>';
         }
@@ -121,11 +147,11 @@ function pages($total, $currentPage, $pageSize, $show=6) {
         {
             if($i != $currentPage)
             {
-                $pageStr .= "<li><a href='" . $i . "'>{$i}</a></li>";
+                $pageStr .= "<li><a href='" . pageUrl($i) . "'>{$i}</a></li>";
             }
             else
             {
-                $pageStr .= "<li><span class='first-page'>{$i}</span></li>";
+                $pageStr .= "<li><span class='first-page'>" .$i. "</span></li>";
             }
         }
 
@@ -133,8 +159,8 @@ function pages($total, $currentPage, $pageSize, $show=6) {
             $pageStr .= "<li>...</li>";
         }
         if ($currentPage<$totalPage) { //如果当前页小总页数，$currentPage只能为小于$totalPage或等于
-            $pageStr .= "<li><a href='" .($currentPage+1). "'>下一页</a></li>";
-            $pageStr .= "<li><a href='{$totalPage}'>尾页</a></li>";
+            $pageStr .= "<li><a href='" . pageUrl($currentPage+1). "'>下一页</a></li>";
+            $pageStr .= "<li><a href='" . pageUrl($totalPage). "'>尾页</a></li>";
         } else {
             $pageStr .= "<li><a href='javascript:;'>下一页</a></li><li><a href='javascript:;'>尾页</a></li>";
         }

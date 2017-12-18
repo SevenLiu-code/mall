@@ -14,17 +14,22 @@ if (!$con) {
     $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
     // 最小值取1
     $page = max($page, 1);
+    $sql = "SELECT COUNT(`id`) AS total FROM `im_goods` WHERE `status` = 1";
+    $obj = mysqli_query($con, $sql);
+    $result = mysqli_fetch_assoc($obj);
+    $total = isset($result['total']) ? $result['total'] : 0;
     // 每页显示条数
-    $pageSize = 2;
+    $pageSize = 3;
     $offset = $pageSize*($page-1);
-    $sql = "SELECT * FROM `im_goods` WHERE `status` = 1 ORDER BY `id` ASC, `view` DESC LIMIT {$offset},{$pageSize}";
+    unset($sql, $obj, $result); // 释放变量
+    // 查我需要的
+    $sql = "SELECT `id`, `pic`,`name`,`des` FROM `im_goods` WHERE `status` = 1 ORDER BY `id` ASC, `view` DESC LIMIT {$offset},{$pageSize}";
     $obj = mysqli_query($con, $sql);
     $goods = array();
     while($result = mysqli_fetch_assoc($obj)){
         $goods[] = $result;
     }
-    echo pages(30, $page, 3, 5);
-    echo getUrl();
+    $pages = pages($total, $page, $pageSize, 5);
 ?>
 
 <!DOCTYPE html>
@@ -59,21 +64,22 @@ if (!$con) {
     </div>
     <div class="img-content">
         <ul>
+            <?php foreach ($goods as $v): ?>
                 <li>
-                    <img class="img-li-fix" src="" alt="">
+                    <img class="img-li-fix" src=" <?php echo $v['pic']; ?> " alt="" style="height: 220px;">
                     <div class="info">
-                        <a href="detail.php?id="><h3 class="img_title"></h3></a>
-                        <p>
-                        </p>
+                        <a href="detail.php?id="><h3 class="img_title"><?php echo $v['name']; ?></h3></a>
+                        <p><?php echo $v['des']; ?></p>
                         <div class="btn">
-                            <a href="edit.php?id=" class="edit">编辑</a>
-                            <a href="delete.php?id=" class="del">删除</a>
+                            <a href="edit.php?id=<?php echo $v['id']; ?>" class="edit">编辑</a>
+                            <a href="delete.php?id=<?php echo $v['id']; ?>" class="del">删除</a>
                         </div>
                     </div>
                 </li>
+            <?php endforeach; ?>
         </ul>
     </div>
-    <div class="page-nav"></div>
+    <?php echo $pages; ?>
 </div>
 
 <div class="footer">
