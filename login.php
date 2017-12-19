@@ -58,7 +58,7 @@ if (!empty($_POST['username'])) {
     <div class="center">
         <div class="center-login">
             <div class="login-banner">
-                <a href="#"><img src="./static/image/login_banner.png" alt=""></a>
+                <a href="index.php"><img src="./static/image/login_banner.png" alt=""></a>
             </div>
             <div class="user-login">
                 <div class="user-box">
@@ -104,11 +104,8 @@ if (!empty($_POST['username'])) {
                 $('#password').focus();
                 return false;
             }
-
-
             return true;
         })
-
     })
 </script>
 </html>

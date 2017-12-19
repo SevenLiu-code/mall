@@ -94,6 +94,7 @@ ul,li{
 .img-content>ul>li .info p{
     line-height:25px;
     margin-top:25px;
+    height: 130px;
 }
 
 .img-content>ul>li .btn{

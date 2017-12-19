@@ -20,6 +20,8 @@ if (!$con) {
     $total = isset($result['total']) ? $result['total'] : 0;
     // 每页显示条数
     $pageSize = 3;
+    // 如果传入page数大于实际数，取实际最大数
+    $page = $page > ceil($total / $pageSize) ? ceil($total / $pageSize) : $page;
     $offset = $pageSize*($page-1);
     unset($sql, $obj, $result); // 释放变量
     // 查我需要的
@@ -66,9 +68,11 @@ if (!$con) {
         <ul>
             <?php foreach ($goods as $v): ?>
                 <li>
-                    <img class="img-li-fix" src=" <?php echo $v['pic']; ?> " alt="" style="height: 220px;">
+                    <a href="detail.php?id=<?php echo $v['id']; ?>">
+                        <img class="img-li-fix" src=" <?php echo $v['pic']; ?> " alt="" style="height: 220px;">
+                    </a>
                     <div class="info">
-                        <a href="detail.php?id="><h3 class="img_title"><?php echo $v['name']; ?></h3></a>
+                        <a href="detail.php?id=<?php echo $v['id']; ?>"><h3 class="img_title"><?php echo $v['name']; ?></h3></a>
                         <p><?php echo $v['des']; ?></p>
                         <div class="btn">
                             <a href="edit.php?id=<?php echo $v['id']; ?>" class="edit">编辑</a>
